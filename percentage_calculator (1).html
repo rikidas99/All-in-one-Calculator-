@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Percentage Calculator</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            margin: 0;
+            width: 100vw;
+            box-sizing: border-box;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Custom styling for inputs to look good on black background */
+        input[type="number"] {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6; /* Blue border on focus */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Hide arrows from number inputs */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-panel p-6 sm:p-8 rounded-2xl w-full max-w-md mx-auto my-auto relative">
+
+        <h1 class="text-3xl font-bold mb-6 text-center text-blue-400">Percentage Calculator</h1>
+        <p class="text-gray-400 text-sm mb-8 text-center">Calculate percentage easily.</p>
+
+        <!-- Mode Navigation Buttons -->
+        <div class="flex flex-wrap sm:flex-nowrap bg-[#1a1a1a] rounded-lg p-1 mb-6 border border-gray-700 gap-1">
+            <button id="btnMode1" onclick="setMode('findPercent')" class="flex-1 py-2 text-xs font-medium rounded-md bg-blue-600/30 text-blue-400 border border-blue-500/50 shadow transition-all">Find %</button>
+            <button id="btnMode2" onclick="setMode('findValue')" class="flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent">Find Value</button>
+            <button id="btnMode3" onclick="setMode('discount')" class="flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent">Discount</button>
+            <button id="btnMode4" onclick="setMode('investment')" class="flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent">Investment</button>
+        </div>
+
+        <div class="space-y-6">
+            <!-- Mode 1 Inputs -->
+            <div id="mode1Inputs" class="space-y-6 block">
+                <div>
+                    <label for="totalValue1" class="block text-sm font-medium text-gray-300 mb-2">Total Value</label>
+                    <input type="number" id="totalValue1" placeholder="e.g. 500" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+                <div>
+                    <label for="partialValue" class="block text-sm font-medium text-gray-300 mb-2">Given Value</label>
+                    <input type="number" id="partialValue" placeholder="e.g. 250" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+            </div>
+
+            <!-- Mode 2 Inputs -->
+            <div id="mode2Inputs" class="space-y-6 hidden">
+                <div>
+                    <label for="totalValue2" class="block text-sm font-medium text-gray-300 mb-2">Total Value</label>
+                    <input type="number" id="totalValue2" placeholder="e.g. 500" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+                <div>
+                    <label for="percentageValue" class="block text-sm font-medium text-gray-300 mb-2">Percentage (%)</label>
+                    <input type="number" id="percentageValue" placeholder="e.g. 67" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+            </div>
+
+            <!-- Mode 3 Inputs -->
+            <div id="mode3Inputs" class="space-y-6 hidden">
+                <div>
+                    <label for="originalPrice" class="block text-sm font-medium text-gray-300 mb-2">Original Price</label>
+                    <input type="number" id="originalPrice" placeholder="e.g. 1000" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+                <div>
+                    <label for="discountPercent" class="block text-sm font-medium text-gray-300 mb-2">Discount (%)</label>
+                    <input type="number" id="discountPercent" placeholder="e.g. 20" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+            </div>
+
+            <!-- Mode 4 Inputs -->
+            <div id="mode4Inputs" class="space-y-6 hidden">
+                <div>
+                    <label for="investedAmount" class="block text-sm font-medium text-gray-300 mb-2">Invested Amount</label>
+                    <input type="number" id="investedAmount" placeholder="e.g. 20000" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+                <!-- Profit / Loss Toggle Buttons -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Type</label>
+                    <div class="flex bg-gray-800 rounded-lg p-1 border border-gray-700 gap-1">
+                        <button type="button" id="btnProfit" onclick="setInvestType('profit')" class="flex-1 py-2 text-xs font-medium rounded-md bg-green-600/30 text-green-400 border border-green-500/50 shadow transition-all">📈 Profit / Gain</button>
+                        <button type="button" id="btnLoss" onclick="setInvestType('loss')" class="flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent">📉 Loss / Drop</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="growthPercent" id="growthLabel" class="block text-sm font-medium text-gray-300 mb-2">Growth / Return (%)</label>
+                    <input type="number" id="growthPercent" placeholder="e.g. 167" class="w-full px-4 py-3 rounded-lg text-lg" oninput="calculate()">
+                </div>
+            </div>
+
+            <!-- Info Guide Toggle Button -->
+            <div class="flex justify-end relative">
+                <button type="button" onclick="toggleInfo()" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-blue-400 transition-colors bg-gray-800/80 px-3 py-1.5 rounded-full border border-gray-700/60 hover:bg-gray-700 shadow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Guide / Help</span>
+                </button>
+
+                <!-- Floating Info Box with Language Switcher -->
+                <div id="infoBox" class="hidden absolute top-10 right-0 left-0 bg-gray-900/95 backdrop-blur-md border border-blue-500/40 shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-lg p-4 z-50 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-3 border-b border-gray-800 pb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-blue-400">Guide / Help</span>
+                        <div class="flex bg-gray-800 rounded-md p-0.5 border border-gray-700">
+                            <button id="langEn" onclick="setLanguage('en')" class="px-2 py-0.5 text-xs font-medium rounded text-gray-400 hover:text-white transition-all">EN</button>
+                            <button id="langHi" onclick="setLanguage('hi')" class="px-2 py-0.5 text-xs font-medium rounded text-white bg-blue-600 transition-all">Hinglish</button>
+                        </div>
+                    </div>
+                    <p id="infoText" class="text-xs text-gray-200 leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div class="relative py-2">
+                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div class="w-full border-t border-gray-600"></div>
+                </div>
+                <div class="relative flex justify-center">
+                    <span class="bg-[#1a1a1a] px-3 text-sm text-gray-400 rounded-full border border-gray-600">Result</span>
+                </div>
+            </div>
+
+            <div class="bg-blue-900/30 border border-blue-500/30 p-6 rounded-xl text-center shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+                <p id="resultLabel" class="text-gray-300 text-sm mb-1">Percentage is</p>
+                <div class="text-5xl font-bold text-white flex items-center justify-center gap-1">
+                    <span id="resultValue">0</span><span id="resultSuffix" class="text-3xl text-blue-400">%</span>
+                </div>
+                <p id="feedbackText" class="text-sm mt-3 h-5 text-gray-400"></p>
+            </div>
+            
+            <button onclick="resetFields()" class="w-full mt-4 bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors border border-gray-700">
+                Reset
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global state variables
+        let currentMode = 'findPercent';
+        let currentLang = 'hi'; // Default language set to Hinglish
+        let investType = 'profit'; // 'profit' or 'loss' for investment mode
+        
+        const infoTexts = {
+            findPercent: {
+                hi: `Yeh option tab kaam aata hai jab aapko pata lagana ho ki koi hissa (part) poore total ka kitna percent (pratishat) hai. <br><span class="text-xs text-blue-300/80 mt-2 block">Example: Agar total 500 hai aur usme se 250 nikalna ho, toh wo kitna percent banega? (Result: 50%)</span>`,
+                en: `This option is useful when you want to find out what percentage a specific part is of the total. <br><span class="text-xs text-blue-300/80 mt-2 block">Example: If total is 500 and you have 250, what percentage does it make? (Result: 50%)</span>`
+            },
+            findValue: {
+                hi: `Yeh option aapko kisi bhi total amount ka ek exact percentage value nikalne me madad karta hai. <br><span class="text-xs text-blue-300/80 mt-2 block">Example: Agar koi pooche ki bhai 500 ka 67% kitna hota hai? (Result: 335)</span>`,
+                en: `This option helps you calculate the exact value of a specific percentage from a total amount. <br><span class="text-xs text-blue-300/80 mt-2 block">Example: If someone asks what is 67% of 500? (Result: 335)</span>`
+            },
+            discount: {
+                hi: `Yeh option shopping ke time kaam aata hai jab aapko pata karna ho ki discount ke baad cheez kitne ki padegi aur kitne paise bachenge. <br><span class="text-xs text-blue-300/80 mt-2 block">Example: Agar 1000 ki shirt par 20% chhoot (discount) hai, toh Final Price hogi 800 aur Bachat 200.</span>`,
+                en: `This option is useful during shopping when you want to know the final price and savings after a discount. <br><span class="text-xs text-blue-300/80 mt-2 block">Example: If a 1000 shirt has a 20% discount, the Final Price is 800 and Savings is 200.</span>`
+            },
+            investment: {
+                hi: `Yeh option stock market ya crypto me investment ka profit ya loss aur total portfolio value nikalne ke liye hai. <br><span class="text-xs text-blue-300/80 mt-2 block">Example (Profit): 20,000 lagaye aur 50% fayda hua, toh Total 30,000 aur Profit +10,000 hoga.<br>Example (Loss): 20,000 lagaye aur 20% loss hua, toh Total 16,000 aur Loss -4,000 hoga.</span>`,
+                en: `This option calculates the profit or loss and total portfolio value for stock market or crypto investments. <br><span class="text-xs text-blue-300/80 mt-2 block">Example (Profit): Invest 20,000 with 50% gain -> Total 30,000, Profit +10,000.<br>Example (Loss): Invest 20,000 with 20% loss -> Total 16,000, Loss -4,000.</span>`
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateInfoText();
+        });
+
+        function toggleInfo() {
+            const infoBox = document.getElementById('infoBox');
+            infoBox.classList.toggle('hidden');
+            updateInfoText();
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const langEn = document.getElementById('langEn');
+            const langHi = document.getElementById('langHi');
+            
+            if (lang === 'en') {
+                langEn.className = 'px-2 py-0.5 text-xs font-medium rounded text-white bg-blue-600 transition-all';
+                langHi.className = 'px-2 py-0.5 text-xs font-medium rounded text-gray-400 hover:text-white transition-all';
+            } else {
+                langHi.className = 'px-2 py-0.5 text-xs font-medium rounded text-white bg-blue-600 transition-all';
+                langEn.className = 'px-2 py-0.5 text-xs font-medium rounded text-gray-400 hover:text-white transition-all';
+            }
+            updateInfoText();
+        }
+
+        function updateInfoText() {
+            const infoText = document.getElementById('infoText');
+            if (infoTexts[currentMode] && infoTexts[currentMode][currentLang]) {
+                infoText.innerHTML = infoTexts[currentMode][currentLang];
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            const btnMode1 = document.getElementById('btnMode1');
+            const btnMode2 = document.getElementById('btnMode2');
+            const btnMode3 = document.getElementById('btnMode3');
+            const btnMode4 = document.getElementById('btnMode4');
+            const mode1Inputs = document.getElementById('mode1Inputs');
+            const mode2Inputs = document.getElementById('mode2Inputs');
+            const mode3Inputs = document.getElementById('mode3Inputs');
+            const mode4Inputs = document.getElementById('mode4Inputs');
+            const resultLabel = document.getElementById('resultLabel');
+            const resultSuffix = document.getElementById('resultSuffix');
+
+            resetFields();
+
+            const inactiveClass = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent';
+            const activeClass = 'flex-1 py-2 text-xs font-medium rounded-md bg-blue-600/30 text-blue-400 border border-blue-500/50 shadow transition-all';
+            
+            btnMode1.className = inactiveClass;
+            btnMode2.className = inactiveClass;
+            btnMode3.className = inactiveClass;
+            btnMode4.className = inactiveClass;
+
+            mode1Inputs.className = 'space-y-6 hidden';
+            mode2Inputs.className = 'space-y-6 hidden';
+            mode3Inputs.className = 'space-y-6 hidden';
+            mode4Inputs.className = 'space-y-6 hidden';
+            
+            document.getElementById('infoBox').classList.add('hidden');
+            updateInfoText();
+
+            if (mode === 'findPercent') {
+                btnMode1.className = activeClass;
+                mode1Inputs.className = 'space-y-6 block';
+                resultLabel.textContent = 'Percentage is';
+                resultSuffix.style.display = 'inline';
+            } else if (mode === 'findValue') {
+                btnMode2.className = activeClass;
+                mode2Inputs.className = 'space-y-6 block';
+                resultLabel.textContent = 'Calculated Value is';
+                resultSuffix.style.display = 'none'; 
+            } else if (mode === 'discount') {
+                btnMode3.className = activeClass;
+                mode3Inputs.className = 'space-y-6 block';
+                resultLabel.textContent = 'Final Price is';
+                resultSuffix.style.display = 'none'; 
+            } else if (mode === 'investment') {
+                btnMode4.className = activeClass;
+                mode4Inputs.className = 'space-y-6 block';
+                resultLabel.textContent = 'Total Portfolio Value';
+                resultSuffix.style.display = 'none';
+            }
+        }
+
+        function setInvestType(type) {
+            investType = type;
+            const btnProfit = document.getElementById('btnProfit');
+            const btnLoss = document.getElementById('btnLoss');
+            const growthLabel = document.getElementById('growthLabel');
+            
+            if (type === 'profit') {
+                btnProfit.className = 'flex-1 py-2 text-xs font-medium rounded-md bg-green-600/30 text-green-400 border border-green-500/50 shadow transition-all';
+                btnLoss.className = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent';
+                growthLabel.textContent = 'Growth / Return (%)';
+            } else {
+                btnLoss.className = 'flex-1 py-2 text-xs font-medium rounded-md bg-red-600/30 text-red-400 border border-red-500/50 shadow transition-all';
+                btnProfit.className = 'flex-1 py-2 text-xs font-medium rounded-md text-gray-400 hover:text-white transition-all border border-transparent';
+                growthLabel.textContent = 'Loss / Drop (%)';
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const resultElement = document.getElementById('resultValue');
+            const feedbackElement = document.getElementById('feedbackText');
+            
+            let finalValue = 0;
+
+            if (currentMode === 'findPercent') {
+                const total = parseFloat(document.getElementById('totalValue1').value);
+                const partial = parseFloat(document.getElementById('partialValue').value);
+
+                if (isNaN(total) || isNaN(partial) || document.getElementById('totalValue1').value === '' || document.getElementById('partialValue').value === '') {
+                    resultElement.textContent = '0';
+                    feedbackElement.innerHTML = '';
+                    return;
+                }
+
+                if (total <= 0) {
+                    resultElement.textContent = 'Err';
+                    feedbackElement.textContent = 'Total value must be greater than zero.';
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-red-400';
+                    return;
+                }
+
+                finalValue = (partial / total) * 100;
+            } 
+            else if (currentMode === 'findValue') {
+                const total = parseFloat(document.getElementById('totalValue2').value);
+                const percent = parseFloat(document.getElementById('percentageValue').value);
+
+                if (isNaN(total) || isNaN(percent) || document.getElementById('totalValue2').value === '' || document.getElementById('percentageValue').value === '') {
+                    resultElement.textContent = '0';
+                    feedbackElement.innerHTML = '';
+                    return;
+                }
+
+                finalValue = (percent / 100) * total;
+            }
+            else if (currentMode === 'discount') {
+                const original = parseFloat(document.getElementById('originalPrice').value);
+                const discount = parseFloat(document.getElementById('discountPercent').value);
+
+                if (isNaN(original) || isNaN(discount) || document.getElementById('originalPrice').value === '' || document.getElementById('discountPercent').value === '') {
+                    resultElement.textContent = '0';
+                    feedbackElement.innerHTML = '';
+                    return;
+                }
+
+                if (original <= 0) {
+                    resultElement.textContent = 'Err';
+                    feedbackElement.textContent = 'Original price must be greater than zero.';
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-red-400';
+                    return;
+                }
+
+                if (discount < 0 || discount > 100) {
+                    resultElement.textContent = 'Err';
+                    feedbackElement.textContent = 'Discount 0 se 100 ke beech me hona chahiye.';
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-red-400';
+                    return;
+                }
+
+                const savedAmount = (discount / 100) * original;
+                finalValue = original - savedAmount;
+                
+                feedbackElement.className = 'text-sm mt-3 h-5 text-gray-400';
+                feedbackElement.innerHTML = `Bachat (Saved): <span class="text-green-400 font-bold ml-1">${savedAmount % 1 !== 0 ? savedAmount.toFixed(2) : savedAmount}</span>`;
+                
+                let formattedValue = finalValue % 1 !== 0 ? finalValue.toFixed(2) : finalValue;
+                animateValue(resultElement, parseFloat(resultElement.textContent) || 0, formattedValue, 300);
+                return;
+            }
+            else if (currentMode === 'investment') {
+                const invested = parseFloat(document.getElementById('investedAmount').value);
+                const growth = parseFloat(document.getElementById('growthPercent').value);
+
+                if (isNaN(invested) || isNaN(growth) || document.getElementById('investedAmount').value === '' || document.getElementById('growthPercent').value === '') {
+                    resultElement.textContent = '0';
+                    feedbackElement.innerHTML = '';
+                    return;
+                }
+
+                if (invested <= 0) {
+                    resultElement.textContent = 'Err';
+                    feedbackElement.textContent = 'Invested amount must be greater than zero.';
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-red-400';
+                    return;
+                }
+
+                if (growth < 0) {
+                    resultElement.textContent = 'Err';
+                    feedbackElement.textContent = 'Percentage cannot be negative.';
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-red-400';
+                    return;
+                }
+
+                if (investType === 'profit') {
+                    const profitAmount = (growth / 100) * invested;
+                    finalValue = invested + profitAmount;
+
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-gray-400';
+                    feedbackElement.innerHTML = `Net Profit: <span class="text-green-400 font-bold ml-1">+${profitAmount % 1 !== 0 ? profitAmount.toFixed(2) : profitAmount}</span>`;
+                } else {
+                    const lossAmount = (growth / 100) * invested;
+                    finalValue = invested - lossAmount;
+                    if (finalValue < 0) finalValue = 0;
+
+                    feedbackElement.className = 'text-sm mt-3 h-5 text-gray-400';
+                    feedbackElement.innerHTML = `Net Loss: <span class="text-red-400 font-bold ml-1">-${lossAmount % 1 !== 0 ? lossAmount.toFixed(2) : lossAmount}</span>`;
+                }
+
+                let formattedValue = finalValue % 1 !== 0 ? finalValue.toFixed(2) : finalValue;
+                animateValue(resultElement, parseFloat(resultElement.textContent) || 0, formattedValue, 300);
+                return;
+            }
+
+            let formattedValue = finalValue % 1 !== 0 ? finalValue.toFixed(2) : finalValue;
+
+            animateValue(resultElement, parseFloat(resultElement.textContent) || 0, formattedValue, 300);
+            
+            feedbackElement.className = 'text-sm mt-3 h-5 text-gray-400';
+            feedbackElement.textContent = ''; 
+        }
+
+        function resetFields() {
+            document.getElementById('totalValue1').value = '';
+            document.getElementById('partialValue').value = '';
+            document.getElementById('totalValue2').value = '';
+            document.getElementById('percentageValue').value = '';
+            document.getElementById('originalPrice').value = '';
+            document.getElementById('discountPercent').value = '';
+            document.getElementById('investedAmount').value = '';
+            document.getElementById('growthPercent').value = '';
+            document.getElementById('resultValue').textContent = '0';
+            
+            const feedbackElement = document.getElementById('feedbackText');
+            feedbackElement.innerHTML = '';
+            feedbackElement.className = 'text-sm mt-3 h-5 text-gray-400';
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                
+                const easeOutQuad = 1 - (1 - progress) * (1 - progress);
+                let currentVal = start + (end - start) * easeOutQuad;
+                
+                if (end % 1 !== 0 || currentVal % 1 !== 0) {
+                     obj.innerHTML = currentVal.toFixed(2);
+                } else {
+                     obj.innerHTML = Math.round(currentVal);
+                }
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                     if (end % 1 !== 0) {
+                         obj.innerHTML = parseFloat(end).toFixed(2);
+                     } else {
+                         obj.innerHTML = end;
+                     }
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
